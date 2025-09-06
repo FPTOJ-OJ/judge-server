@@ -7,12 +7,6 @@
   <a href="https://github.com/KienPC1234/fptoj_judge/actions?query=workflow%3Abuild">
     <img alt="Linux Build Status" src="https://img.shields.io/github/actions/workflow/status/KienPC1234/fptoj_judge/build.yml?branch=master&logo=linux"/>
   </a>
-  <a href="https://ci.dmoj.ca/view/DMOJ/job/dmoj-judge-freebsd-py3/">
-    <img alt="FreeBSD Build Status" src="https://img.shields.io/jenkins/build?jobUrl=https%3A%2F%2Fci.dmoj.ca%2Fview%2FDMOJ%2Fjob%2Fdmoj-judge-freebsd-py3%2F&logo=freebsd"/>
-  </a>
-  <a href="https://codecov.io/gh/KienPC1234/fptoj_judge">
-    <img alt="Coverage" src="https://img.shields.io/codecov/c/github/KienPC1234/fptoj_judge.svg"/>
-  </a>
   <a href="LICENSE.md">
     <img alt="License" src="https://img.shields.io/github/license/KienPC1234/fptoj_judge"/>
   </a>
@@ -28,14 +22,11 @@ The judge implements secure grading on Linux and FreeBSD machines.
 
 |     | Linux | FreeBSD |
 | --: | :---: | :-----: |
-| x64 | [✔](https://github.com/KienPC1234/fptoj_judge/actions/workflows/build.yml) | [✔](https://ci.dmoj.ca/job/dmoj-judge-freebsd/) |
+| x64 | [✔](https://github.com/KienPC1234/fptoj_judge/actions/workflows/build.yml) | [❌](https://ci.dmoj.ca/job/dmoj-judge-freebsd/) |
 | x86 | ✔ | ¯\\\_(ツ)\_/¯ |
 | x32 | ✔ | &mdash; |
 | ARM | [✔](https://github.com/KienPC1234/fptoj_judge/actions/workflows/build.yml) | ❌ |
 
-Versions up to and including [v1.4.0](https://github.com/KienPC1234/fptoj_judge/releases/tag/v1.4.0) also supported grading on Windows machines.
-
-Versions up to and including [v3.0.2](https://github.com/KienPC1234/fptoj_judge/releases/tag/v3.0.2) also supported grading
 with pure ptrace without seccomp, which is useful on Linux kernel versions before 4.8.
 
 The DMOJ judge does **not** need a root user to run on Linux machines: it will run just fine under a normal user.
@@ -98,12 +89,12 @@ local judge, useful for testing problems.
 
 For more detailed steps, read the [installation instructions](https://docs.dmoj.ca/#/judge/setting_up_a_judge).
 
-Note that **the only Linux distribution with first-class support is the latest Debian**, with the default `apt` versions of all runtimes. This is [what we run on dmoj.ca](https://dmoj.ca/runtimes/matrix/), and it should "just work". While the judge will likely still work with other distributions and runtime versions, some runtimes might fail to initialize. In these cases, please [file an issue](https://github.com/KienPC1234/fptoj_judge/issues).
+Note that **the only Linux distribution with first-class support is the latest Debian**, with the default `apt` versions of all runtimes. This is [what we run on fptoj.com](https://fptoj.com/runtimes/matrix/), and it should "just work". While the judge will likely still work with other distributions and runtime versions, some runtimes might fail to initialize. In these cases, please [file an issue](https://github.com/KienPC1234/fptoj_judge/issues).
 
 
 ### Bleeding-edge build
 
-This is the version of the codebase we run live on [dmoj.ca](https://dmoj.ca/).
+This is the version of the codebase we run live on [fptoj.com](https://fptoj.com/).
 
 ```
 $ git clone --recursive https://github.com/KienPC1234/fptoj_judge.git
