@@ -235,11 +235,14 @@ class BaseExecutor(metaclass=ExecutorMeta):
         write_fs = self.get_write_fs()
         if extra_fs:
             read_fs += extra_fs
-        if launch_kwargs and 'input_file' in launch_kwargs and launch_kwargs['input_file']:
-            read_fs.append(ExactFile(os.path.join(self._dir, launch_kwargs['input_file'] or '')))
-        if launch_kwargs and 'output_file' in launch_kwargs and launch_kwargs['output_file']:
-            read_fs.append(ExactFile(os.path.join(self._dir, launch_kwargs['output_file'] or '')))
-            write_fs.append(ExactFile(os.path.join(self._dir, launch_kwargs['output_file'] or '')))
+        input_file = launch_kwargs.get('input_file')
+        if input_file:
+            read_fs.append(ExactFile(os.path.join(self._dir, input_file)))
+        output_file = launch_kwargs.get('output_file')
+        if output_file:
+            full_path = os.path.join(self._dir, output_file)
+            read_fs.append(ExactFile(full_path))
+            write_fs.append(ExactFile(full_path))
         if self._dir:
             read_fs.append(RecursiveDir(self._dir))
             write_fs.append(RecursiveDir(self._dir))
