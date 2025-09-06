@@ -37,7 +37,6 @@ class StandardGrader(BaseGrader):
                 input_path = os.path.join(self.binary._dir, cast(str, input_file)) if input_file is not None else "" # type: ignore
                 output_path = os.path.join(self.binary._dir, cast(str, output_file)) if output_file is not None else "" # type: ignore
                 if input_path:
-                    log.debug(f'Creating input file: {input_path}')
                     with open(input_path, 'wb') as f:
                         f.write(case.input_data())
             except OSError as e:
@@ -85,7 +84,6 @@ class StandardGrader(BaseGrader):
         if output_path and os.path.exists(output_path):
             try:
                 os.unlink(output_path)
-                log.debug(f'Cleaned up output file: {output_path}')
             except OSError as e:
                 log.warning(f'Failed to clean up output file {output_path}: {str(e)}')
 
