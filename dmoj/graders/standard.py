@@ -34,8 +34,8 @@ class StandardGrader(BaseGrader):
         output_path = None
         if io_mode == 'file':
             try:
-                input_path = os.path.join(self.binary._dir, cast(str, input_file)) if input_file else ""
-                output_path = os.path.join(self.binary._dir, cast(str, output_file)) if output_file else ""
+                input_path = os.path.join(self.binary._dir, cast(str, input_file)) if input_file is not None else "" # type: ignore
+                output_path = os.path.join(self.binary._dir, cast(str, output_file)) if output_file is not None else "" # type: ignore
                 if input_path:
                     log.debug(f'Creating input file: {input_path}')
                     with open(input_path, 'wb') as f:
