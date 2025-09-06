@@ -1,0 +1,25 @@
+id: dev_judge          # Đặt tên cho judge (phải trùng với id bạn add trong admin site)
+key: pvxd2sBMwr5QpbbaTum8h5p27eLRUVG3ub2XGGpcaDdTZMBo5f4Y2Ltalmd4mAJvvG61qqQM5cGm8blwzAM+qmDZ8SSubyE6kXG4
+
+problem_storage_globs:
+  - /data/problems/*
+
+runtime:
+  as_x64: /usr/bin/x86_64-linux-gnu-as
+  as_x86: /usr/bin/as
+  awk: /usr/bin/mawk
+  cat: /usr/bin/cat
+  g++: /usr/bin/g++
+  g++11: /usr/bin/g++
+  g++14: /usr/bin/g++
+  g++17: /usr/bin/g++
+  g++20: /usr/bin/g++
+  gcc: /usr/bin/gcc
+  gcc11: /usr/bin/gcc
+  ld_x64: /usr/bin/x86_64-linux-gnu-ld
+  ld_x86: /usr/bin/ld
+  node: /usr/local/bin/node
+  perl: /usr/bin/perl
+  python3: /home/kien/site_dev/dmojsite/bin/python3
+  sed: /usr/bin/sed
+  tclsh: /usr/bin/tclsh
