@@ -1,7 +1,7 @@
 import logging
 import os
 import subprocess
-from typing import Optional
+from typing import Optional, cast
 from dmoj.checkers import CheckerOutput
 from dmoj.cptbox import TracedPopen
 from dmoj.cptbox.lazy_bytes import LazyBytes
@@ -34,8 +34,8 @@ class StandardGrader(BaseGrader):
         output_path = None
         if io_mode == 'file':
             try:
-                input_path = os.path.join(self.binary._dir, input_file) if input_file else ""
-                output_path = os.path.join(self.binary._dir, output_file) if output_file else ""
+                input_path = os.path.join(self.binary._dir, cast(str, input_file)) if input_file else ""
+                output_path = os.path.join(self.binary._dir, cast(str, output_file)) if output_file else ""
                 if input_path:
                     log.debug(f'Creating input file: {input_path}')
                     with open(input_path, 'wb') as f:

@@ -6,7 +6,7 @@ import subprocess
 import sys
 import tempfile
 import traceback
-from typing import Any, Callable, Dict, List, Optional, Tuple, Type, Union
+from typing import Any, Callable, Dict, List, Optional, Tuple, Type, Union, cast
 
 from dmoj.cptbox import IsolateTracer, TracedPopen, syscalls
 from dmoj.cptbox.filesystem_policies import ExactDir, ExactFile, FilesystemAccessRule, RecursiveDir
@@ -237,12 +237,14 @@ class BaseExecutor(metaclass=ExecutorMeta):
             read_fs += extra_fs
         input_file = launch_kwargs.get('input_file')
         if input_file:
-            read_fs.append(ExactFile(os.path.join(self._dir, input_file)))
+            input_path = os.path.join(self._dir, cast(str, input_file))
+            read_fs.append(ExactFile(input_path))
+        
         output_file = launch_kwargs.get('output_file')
         if output_file:
-            full_path = os.path.join(self._dir, output_file)
-            read_fs.append(ExactFile(full_path))
-            write_fs.append(ExactFile(full_path))
+            output_path = os.path.join(self._dir, cast(str, output_file))
+            read_fs.append(ExactFile(output_path))
+            write_fs.append(ExactFile(output_path))
         if self._dir:
             read_fs.append(RecursiveDir(self._dir))
             write_fs.append(RecursiveDir(self._dir))
