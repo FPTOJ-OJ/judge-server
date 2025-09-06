@@ -1,4 +1,4 @@
-id: dev_judge          # Đặt tên cho judge (phải trùng với id bạn add trong admin site)
+id: dev_judge
 key: pvxd2sBMwr5QpbbaTum8h5p27eLRUVG3ub2XGGpcaDdTZMBo5f4Y2Ltalmd4mAJvvG61qqQM5cGm8blwzAM+qmDZ8SSubyE6kXG4
 
 problem_storage_globs:

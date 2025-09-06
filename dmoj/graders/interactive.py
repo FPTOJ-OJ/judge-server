@@ -105,10 +105,10 @@ class Interactor:
 class InteractiveGrader(StandardGrader):
     check: CheckerOutput
 
-    def _launch_process(self, case, input_file=None):
+    def _launch_process( self, case: TestCase, input_file, io_mode: str = "std",  output_file: Optional[str] = None, input_file_io=None) -> None:
         super()._launch_process(case, input_file=None)
 
-    def _interact_with_process(self, case: TestCase, result: Result) -> bytes:
+    def _interact_with_process(self, case: TestCase, result: Result, io_mode: str = "std", output_path: Optional[str]=None) -> bytes:
         assert self._current_proc is not None
         assert self._current_proc.stderr is not None
 

@@ -16,14 +16,11 @@
   <a href="LICENSE.md">
     <img alt="License" src="https://img.shields.io/github/license/DMOJ/judge-server"/>
   </a>
-  <a href="https://dmoj.ca/about/discord/">
-    <img src="https://img.shields.io/discord/677340492651954177?color=%237289DA&label=Discord"/>
-  </a>
 </p>
 
-Contest judge backend for the [DMOJ site](https://github.com/DMOJ/online-judge) interface, supporting <b>IO-based</b>, <b>interactive</b>, and <b>signature-graded</b> tasks, with <b>runtime data generators</b> and <b>custom output validators</b>.
+Contest judge backend for the [FPTOJ site](https://github.com/DMOJ/online-judge) interface, supporting <b>IO-based</b>, <b>interactive</b>, and <b>signature-graded</b> tasks, with <b>runtime data generators</b> and <b>custom output validators</b>.
 
-See it in action at [dmoj.ca](https://dmoj.ca/)!
+See it in action at [fptoj.com](https://fptoj.com/)!
 
 ## Supported platforms and runtimes
 
@@ -95,7 +92,7 @@ The judge can also grade in the languages listed below:
 
 ## Installation
 
-Installing the DMOJ judge creates two executables in your Python's script directory: `dmoj` and `dmoj-cli`.
+Installing the FPTOJ judge creates two executables in your Python's script directory: `dmoj` and `dmoj-cli`.
 `dmoj` is used to connect a judge to a DMOJ site instance, while `dmoj-cli` provides a command-line interface to a
 local judge, useful for testing problems.
 
@@ -103,17 +100,6 @@ For more detailed steps, read the [installation instructions](https://docs.dmoj.
 
 Note that **the only Linux distribution with first-class support is the latest Debian**, with the default `apt` versions of all runtimes. This is [what we run on dmoj.ca](https://dmoj.ca/runtimes/matrix/), and it should "just work". While the judge will likely still work with other distributions and runtime versions, some runtimes might fail to initialize. In these cases, please [file an issue](https://github.com/DMOJ/judge-server/issues).
 
-### Stable build
-
-[![PyPI version](https://badge.fury.io/py/dmoj.svg)](https://pypi.org/project/dmoj/)
-[![PyPI](https://img.shields.io/pypi/pyversions/dmoj.svg)](https://pypi.org/project/dmoj/)
-
-We periodically publish builds [on PyPI](https://pypi.org/project/dmoj/). This is the easiest way to get started,
-but may not contain all the latest features and improvements.
-
-```
-$ pip install dmoj
-```
 
 ### Bleeding-edge build
 
@@ -136,7 +122,7 @@ We maintain Docker images with all runtimes we support in the [runtimes-docker](
 
 Runtimes are split into three tiers of decreasing support. Tier 1 includes
 Python 2/3, C/C++ (GCC only), Java 8, and Pascal. Tier 3 contains all the
-runtimes we run on [dmoj.ca](https://dmoj.ca/). Tier 2 contains some in-between
+runtimes we run on [fptoj.com](https://fptoj.com/). Tier 2 contains some in-between
 mix; read the `Dockerfile` for each tier for details. These images are rebuilt
 and tested every week to contain the latest runtime versions.
 

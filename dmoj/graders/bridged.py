@@ -1,7 +1,7 @@
 import os
 import shlex
 import subprocess
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 
 from dmoj.checkers import CheckerOutput
 from dmoj.config import ConfigNode
@@ -58,7 +58,7 @@ class BridgedInteractiveGrader(StandardGrader):
 
         return (not result.result_flag) and parsed_result
 
-    def _launch_process(self, case: TestCase, input_file=None) -> None:
+    def _launch_process( self, case: TestCase, io_mode: str = "std", input_file: Optional[str] = None, output_file: Optional[str] = None, input_file_io=None) -> None:
         self._interactor_stdin_pipe, submission_stdout_pipe = os.pipe()
         submission_stdin_pipe, self._interactor_stdout_pipe = os.pipe()
         self._current_proc = self.binary.launch(
@@ -73,7 +73,7 @@ class BridgedInteractiveGrader(StandardGrader):
         os.close(submission_stdin_pipe)
         os.close(submission_stdout_pipe)
 
-    def _interact_with_process(self, case: TestCase, result: Result) -> bytes:
+    def _interact_with_process(self, case: TestCase, result: Result, io_mode: str = "std", output_path: Optional[str]=None) -> bytes:
         assert self._current_proc is not None
         assert self._current_proc.stderr is not None
 

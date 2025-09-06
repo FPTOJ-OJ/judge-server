@@ -94,10 +94,14 @@ class StandardGrader(BaseGrader):
 
     def populate_result(self, error: bytes, result: Result, process: TracedPopen) -> None:
         self.binary.populate_result(error, result, process)
-        log.debug(f'Populated result: max_memory={result.max_memory}, execution_time={result.execution_time}')
 
     def check_result(self, case: TestCase, result: Result) -> CheckerOutput:
+        # If the submission didn't crash and didn't time out, there's a chance it might be AC
+        # We shouldn't run checkers if the submission is already known to be incorrect, because some checkers
+        # might be very computationally expensive.
+        # See https://github.com/DMOJ/judge-server/issues/170
         checker = case.checker()
+        # checker is a `partial` object, NOT a `function` object
         if not result.result_flag or getattr(checker.func, 'run_on_error', False):
             try:
                 check = checker(
@@ -116,13 +120,16 @@ class StandardGrader(BaseGrader):
                     result=result,
                 )
             except UnicodeDecodeError:
-                log.warning('UnicodeDecodeError in checker')
+                # Don't rely on problemsetters to do sane things when it comes to Unicode handling, so
+                # just proactively swallow all Unicode-related checker errors.
                 return CheckerResult(False, 0, feedback='invalid unicode')
         else:
+            # Solution is guaranteed to receive 0 points
             check = False
+
         return check
 
-    def _launch_process(self, case: TestCase, io_mode: str, input_file: str, output_file: str, input_file_io=None,) -> None:
+    def _launch_process(self, case: TestCase, io_mode: str, input_file: str, output_file: str, input_file_io) -> None:
         if io_mode == "file":
             self._current_proc = self.binary.launch(
                 time=self.problem.time_limit,
@@ -150,7 +157,7 @@ class StandardGrader(BaseGrader):
         process = self._current_proc
         assert process is not None
         try:
-            _, error = process.communicate(
+            result.proc_output, error = process.communicate(
                 None, outlimit=case.config.output_limit_length, errlimit=1048576
             )
         except OutputLimitExceeded:
@@ -168,8 +175,6 @@ class StandardGrader(BaseGrader):
                 result.result_flag = Result.IE
                 result.feedback = f'Cannot read output file: {str(e)}'
                 result.proc_output = b''
-        else:
-            result.proc_output = case._normalize(error)
 
         return error
 
