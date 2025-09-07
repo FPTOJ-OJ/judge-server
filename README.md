@@ -1,18 +1,18 @@
 <h1 align="center">
-  <img src="https://github.com/KienPC1234/fptoj/blob/main/logo.png?raw=true" width="120px">
+  <img src="https://github.com/FPTOJ-OJ/online-judge/blob/main/logo.png?raw=true" width="120px">
   <br>
   FPTOJ Judge
 </h1>
 <p align="center">
-  <a href="https://github.com/KienPC1234/fptoj_judge/actions?query=workflow%3Abuild">
-    <img alt="Linux Build Status" src="https://img.shields.io/github/actions/workflow/status/KienPC1234/fptoj_judge/build.yml?branch=master&logo=linux"/>
+  <a href="https://github.com/FPTOJ-OJ/judge-server/actions?query=workflow%3Abuild">
+    <img alt="Linux Build Status" src="https://img.shields.io/github/actions/workflow/status/FPTOJ-OJ/judge-server/build.yml?branch=master&logo=linux"/>
   </a>
   <a href="LICENSE.md">
-    <img alt="License" src="https://img.shields.io/github/license/KienPC1234/fptoj_judge"/>
+    <img alt="License" src="https://img.shields.io/github/license/FPTOJ-OJ/judge-server"/>
   </a>
 </p>
 
-Contest judge backend for the [FPTOJ site](https://github.com/KienPC1234/fptoj) interface, supporting <b>IO-based</b>, <b>interactive</b>, and <b>signature-graded</b> tasks, with <b>runtime data generators</b> and <b>custom output validators</b>.
+Contest judge backend for the [FPTOJ site](https://github.com/FPTOJ-OJ/online-judge) interface, supporting <b>IO-based</b>, <b>interactive</b>, and <b>signature-graded</b> tasks, with <b>runtime data generators</b> and <b>custom output validators</b>.
 
 See it in action at [fptoj.com](https://fptoj.com/)!
 
@@ -22,14 +22,14 @@ The judge implements secure grading on Linux and FreeBSD machines.
 
 |     | Linux | FreeBSD |
 | --: | :---: | :-----: |
-| x64 | [✔](https://github.com/KienPC1234/fptoj_judge/actions/workflows/build.yml) | [❌](https://ci.dmoj.ca/job/dmoj-judge-freebsd/) |
+| x64 | [✔](https://github.com/FPTOJ-OJ/judge-server/actions/workflows/build.yml) | [❌](https://ci.dmoj.ca/job/dmoj-judge-freebsd/) |
 | x86 | ✔ | ¯\\\_(ツ)\_/¯ |
 | x32 | ✔ | &mdash; |
-| ARM | [✔](https://github.com/KienPC1234/fptoj_judge/actions/workflows/build.yml) | ❌ |
+| ARM | [✔](https://github.com/FPTOJ-OJ/judge-server/actions/workflows/build.yml) | ❌ |
 
 with pure ptrace without seccomp, which is useful on Linux kernel versions before 4.8.
 
-The DMOJ judge does **not** need a root user to run on Linux machines: it will run just fine under a normal user.
+The FPTOJ judge does **not** need a root user to run on Linux machines: it will run just fine under a normal user.
 
 Supported languages include:
 
@@ -84,12 +84,12 @@ The judge can also grade in the languages listed below:
 ## Installation
 
 Installing the FPTOJ judge creates two executables in your Python's script directory: `dmoj` and `dmoj-cli`.
-`dmoj` is used to connect a judge to a DMOJ site instance, while `dmoj-cli` provides a command-line interface to a
+`dmoj` is used to connect a judge to a FPTOJ site instance, while `dmoj-cli` provides a command-line interface to a
 local judge, useful for testing problems.
 
 For more detailed steps, read the [installation instructions](https://docs.dmoj.ca/#/judge/setting_up_a_judge).
 
-Note that **the only Linux distribution with first-class support is the latest Debian**, with the default `apt` versions of all runtimes. This is [what we run on fptoj.com](https://fptoj.com/runtimes/matrix/), and it should "just work". While the judge will likely still work with other distributions and runtime versions, some runtimes might fail to initialize. In these cases, please [file an issue](https://github.com/KienPC1234/fptoj_judge/issues).
+Note that **the only Linux distribution with first-class support is the latest Debian**, with the default `apt` versions of all runtimes. This is [what we run on fptoj.com](https://fptoj.com/runtimes/matrix/), and it should "just work". While the judge will likely still work with other distributions and runtime versions, some runtimes might fail to initialize. In these cases, please [file an issue](https://github.com/FPTOJ-OJ/judge-server/issues).
 
 
 ### Bleeding-edge build
@@ -97,7 +97,7 @@ Note that **the only Linux distribution with first-class support is the latest D
 This is the version of the codebase we run live on [fptoj.com](https://fptoj.com/).
 
 ```
-$ git clone --recursive https://github.com/KienPC1234/fptoj_judge.git
+$ git clone --recursive https://github.com/FPTOJ-OJ/judge-server.git
 $ cd judge-server
 $ pip install -e .
 ```
@@ -124,7 +124,7 @@ to be placed under `/mnt/problems`, and judge-specific configuration to be in
 and will be merged automatically into the `judge.yml` provided.
 
 ```
-$ git clone --recursive https://github.com/KienPC1234/fptoj_judge.git
+$ git clone --recursive https://github.com/FPTOJ-OJ/judge-server.git
 $ cd judge-server/.docker
 $ make judge-tier1
 $ exec docker run \
