@@ -1,4 +1,4 @@
-FROM dmoj/runtimes-tier2
+FROM fptoj/runtimes-tier2
 
 ARG TAG=master
 RUN mkdir /judge /problems && cd /judge && \
