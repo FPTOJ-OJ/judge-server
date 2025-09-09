@@ -239,13 +239,12 @@ class BaseExecutor(metaclass=ExecutorMeta):
         if input_file:
             input_path = os.path.join(self._dir, cast(str, input_file)) # type: ignore
             read_fs.append(ExactFile(input_path))
-        
         output_file = launch_kwargs.get('output_file')
         if output_file:
             output_path = os.path.join(self._dir, cast(str, output_file)) # type: ignore
             read_fs.append(ExactFile(output_path))
             write_fs.append(ExactFile(output_path))
-        if self._dir:
+        if self._dir and input_file and output_file:
             read_fs.append(RecursiveDir(self._dir))
             write_fs.append(RecursiveDir(self._dir))
             

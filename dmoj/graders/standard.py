@@ -182,5 +182,6 @@ class StandardGrader(BaseGrader):
             self.source,
             hints=self.problem.config.hints or [],
             unbuffered=self.problem.config.unbuffered,
+            cached=True,
         )
         return binary
