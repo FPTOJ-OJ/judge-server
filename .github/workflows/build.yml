@@ -42,31 +42,12 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        # Python 3.10–3.13 are the versions available in the latest
-        # DMOJ/runtimes-python release. 3.7–3.9 have been dropped upstream.
+        # Use deadsnakes PPA for Python versions – no dependency on DMOJ releases.
         python-version: [ '3.10', '3.11', '3.12', '3.13' ]
     steps:
       - uses: actions/checkout@v4
       - name: Download docker image
         run: docker pull dmoj/runtimes-tier3
-      - name: Install python runtime
-        run: |
-          # Fetch the browser_download_url for the requested version from the
-          # GitHub API so we are not hard-coding a specific release tag.
-          ASSET_URL=$(curl -sSf "https://api.github.com/repos/DMOJ/runtimes-python/releases/latest" \
-            | python3 -c "
-          import sys, json
-          data = json.load(sys.stdin)
-          ver = '${{ matrix.python-version }}'
-          name = f'python{ver}-amd64.tar.gz'
-          for a in data.get('assets', []):
-              if a['name'] == name:
-                  print(a['browser_download_url'])
-                  break
-          else:
-              raise SystemExit(f'Asset {name} not found in latest release')
-          ")
-          curl -sSfL "$ASSET_URL" | tar -xz
       - name: Create docker scripts
         run: |
           cat > run <<'EOF'
@@ -75,7 +56,28 @@ jobs:
           export LANG=C.UTF-8
           export PYTHONIOENCODING=utf8
           cd /code
-          export PYTHON="/code/python${{ matrix.python-version }}/bin/python${{ matrix.python-version }}"
+
+          # Install the requested Python version from the deadsnakes PPA.
+          # This is independent of any DMOJ release infrastructure.
+          apt-get update -qq
+          apt-get install -y software-properties-common
+          add-apt-repository -y ppa:deadsnakes/ppa
+          apt-get update -qq
+          apt-get install -y \
+            python$PYTHON_VERSION \
+            python$PYTHON_VERSION-venv \
+            python$PYTHON_VERSION-dev \
+            python$PYTHON_VERSION-distutils || \
+          apt-get install -y \
+            python$PYTHON_VERSION \
+            python$PYTHON_VERSION-venv \
+            python$PYTHON_VERSION-dev
+
+          export PYTHON="python$PYTHON_VERSION"
+
+          # Bootstrap pip for this interpreter.
+          curl -sSf https://bootstrap.pypa.io/get-pip.py | "$PYTHON"
+
           "$PYTHON" -m pip install --upgrade pip wheel
           "$PYTHON" -m pip install cython coverage
           "$PYTHON" -m pip install -e .[test]
@@ -100,12 +102,19 @@ jobs:
           key: ${{ runner.os }}-python-${{ matrix.python-version }}-pip-${{ hashFiles('**/requirements.txt') }}
           restore-keys: |
             ${{ runner.os }}-pip-${{ matrix.python-version }}
-      - name: Create cache
+      - name: Create cache directory
         run: |
           mkdir -p "$HOME/docker-cache/pip"
           sudo chown root:root -R "$HOME/docker-cache"
       - name: Execute tests in docker
-        run: docker run -e PYTHON_VERSION="${{ matrix.python-version }}" -v "$(pwd):/code" -v "$HOME/docker-cache:/root/.cache" --cap-add=SYS_PTRACE dmoj/runtimes-tier3 || true
+        run: |
+          docker run \
+            -e PYTHON_VERSION="${{ matrix.python-version }}" \
+            -v "$(pwd):/code" \
+            -v "$HOME/docker-cache:/root/.cache" \
+            --cap-add=SYS_PTRACE \
+            dmoj/runtimes-tier3 \
+            /code/run || true
       - name: Upload coverage data
         uses: codecov/codecov-action@v4
       - name: Prepare cache for storage
@@ -127,26 +136,27 @@ jobs:
           cp -r /source /code
           cd /code
 
-          # Resolve the asset URL dynamically so we never hard-code a stale tag.
-          ASSET_URL=$(curl -sSf "https://api.github.com/repos/DMOJ/runtimes-python/releases/latest" \
-            | python3 -c "
-          import sys, json
-          data = json.load(sys.stdin)
-          ver = '${{ matrix.python-version }}'
-          name = f'python{ver}-aarch64.tar.gz'
-          for a in data.get('assets', []):
-              if a['name'] == name:
-                  print(a['browser_download_url'])
-                  break
-          else:
-              raise SystemExit(f'Asset {name} not found in latest release')
-          ")
-          curl -sSfL "$ASSET_URL" | tar -xz
+          # Install the requested Python version from deadsnakes PPA (aarch64).
+          apt-get update -qq
+          apt-get install -y software-properties-common
+          add-apt-repository -y ppa:deadsnakes/ppa
+          apt-get update -qq
+          apt-get install -y \
+            python$PYTHON_VERSION \
+            python$PYTHON_VERSION-venv \
+            python$PYTHON_VERSION-dev \
+            python$PYTHON_VERSION-distutils || \
+          apt-get install -y \
+            python$PYTHON_VERSION \
+            python$PYTHON_VERSION-venv \
+            python$PYTHON_VERSION-dev
+
+          export PYTHON="python$PYTHON_VERSION"
+          curl -sSf https://bootstrap.pypa.io/get-pip.py | "$PYTHON"
 
           export PYTHONUNBUFFERED=1
           export LANG=C.UTF-8
           export PYTHONIOENCODING=utf8
-          export PYTHON="/code/python${{ matrix.python-version }}/bin/python${{ matrix.python-version }}"
 
           "$PYTHON" -m pip install --upgrade pip wheel
           "$PYTHON" -m pip install cython coverage
@@ -172,7 +182,12 @@ jobs:
           chmod a+x run run-su
       - name: Execute tests in docker
         run: |
-          docker run -e PYTHON_VERSION="${{ matrix.python-version }}" -v "$(pwd):/source" -v "$HOME/docker-cache:/root/.cache" \
-            --entrypoint=/usr/bin/tini --cap-add=SYS_PTRACE dmoj/runtimes-tier3 /source/run || true
+          docker run \
+            -e PYTHON_VERSION="${{ matrix.python-version }}" \
+            -v "$(pwd):/source" \
+            -v "$HOME/docker-cache:/root/.cache" \
+            --entrypoint=/usr/bin/tini \
+            --cap-add=SYS_PTRACE \
+            dmoj/runtimes-tier3 /source/run || true
       - name: Upload coverage data
         uses: codecov/codecov-action@v4
