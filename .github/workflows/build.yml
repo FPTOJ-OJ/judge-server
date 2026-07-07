@@ -42,12 +42,39 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        # Use deadsnakes PPA for Python versions – no dependency on DMOJ releases.
+        # python-build-standalone ships pre-built CPython for any Linux distro.
+        # No PPA, no apt, no DMOJ dependency required.
         python-version: [ '3.10', '3.11', '3.12', '3.13' ]
     steps:
       - uses: actions/checkout@v4
       - name: Download docker image
         run: docker pull dmoj/runtimes-tier3
+      - name: Download python-build-standalone
+        run: |
+          # Query the latest release from astral-sh/python-build-standalone.
+          # We pick the "install_only" x86_64 GNU/Linux build – a self-contained
+          # CPython that works on any Linux distro without extra apt packages.
+          ASSET_URL=$(curl -sSf "https://api.github.com/repos/astral-sh/python-build-standalone/releases/latest" \
+            | python3 -c "
+          import sys, json, re
+          data = json.load(sys.stdin)
+          ver = '${{ matrix.python-version }}'
+          # Match e.g. cpython-3.11.*-x86_64-unknown-linux-gnu-install_only.tar.gz
+          pattern = re.compile(
+              r'^cpython-' + re.escape(ver) + r'\.\d+\+\d+-x86_64-unknown-linux-gnu-install_only\.tar\.gz$'
+          )
+          for a in data.get('assets', []):
+              if pattern.match(a['name']):
+                  print(a['browser_download_url'])
+                  break
+          else:
+              raise SystemExit(f'No install_only asset found for Python {ver} (x86_64)')
+          ")
+          echo "Downloading: $ASSET_URL"
+          curl -sSfL "$ASSET_URL" | tar -xz
+          # The tarball extracts to a directory like python/
+          # Expose a predictable path for the docker scripts below.
+          echo "PYTHON_DIR=$(pwd)/python" >> "$GITHUB_ENV"
       - name: Create docker scripts
         run: |
           cat > run <<'EOF'
@@ -57,26 +84,8 @@ jobs:
           export PYTHONIOENCODING=utf8
           cd /code
 
-          # Install the requested Python version from the deadsnakes PPA.
-          # This is independent of any DMOJ release infrastructure.
-          apt-get update -qq
-          apt-get install -y software-properties-common
-          add-apt-repository -y ppa:deadsnakes/ppa
-          apt-get update -qq
-          apt-get install -y \
-            python$PYTHON_VERSION \
-            python$PYTHON_VERSION-venv \
-            python$PYTHON_VERSION-dev \
-            python$PYTHON_VERSION-distutils || \
-          apt-get install -y \
-            python$PYTHON_VERSION \
-            python$PYTHON_VERSION-venv \
-            python$PYTHON_VERSION-dev
-
-          export PYTHON="python$PYTHON_VERSION"
-
-          # Bootstrap pip for this interpreter.
-          curl -sSf https://bootstrap.pypa.io/get-pip.py | "$PYTHON"
+          # Use the pre-built Python mounted from the host runner.
+          export PYTHON="/code/python/bin/python3"
 
           "$PYTHON" -m pip install --upgrade pip wheel
           "$PYTHON" -m pip install cython coverage
@@ -136,24 +145,25 @@ jobs:
           cp -r /source /code
           cd /code
 
-          # Install the requested Python version from deadsnakes PPA (aarch64).
-          apt-get update -qq
-          apt-get install -y software-properties-common
-          add-apt-repository -y ppa:deadsnakes/ppa
-          apt-get update -qq
-          apt-get install -y \
-            python$PYTHON_VERSION \
-            python$PYTHON_VERSION-venv \
-            python$PYTHON_VERSION-dev \
-            python$PYTHON_VERSION-distutils || \
-          apt-get install -y \
-            python$PYTHON_VERSION \
-            python$PYTHON_VERSION-venv \
-            python$PYTHON_VERSION-dev
+          # Query latest python-build-standalone aarch64 build.
+          ASSET_URL=$(curl -sSf "https://api.github.com/repos/astral-sh/python-build-standalone/releases/latest" \
+            | python3 -c "
+          import sys, json, re
+          data = json.load(sys.stdin)
+          ver = '${{ matrix.python-version }}'
+          pattern = re.compile(
+              r'^cpython-' + re.escape(ver) + r'\.\d+\+\d+-aarch64-unknown-linux-gnu-install_only\.tar\.gz$'
+          )
+          for a in data.get('assets', []):
+              if pattern.match(a['name']):
+                  print(a['browser_download_url'])
+                  break
+          else:
+              raise SystemExit(f'No install_only asset found for Python {ver} (aarch64)')
+          ")
+          curl -sSfL "$ASSET_URL" | tar -xz
 
-          export PYTHON="python$PYTHON_VERSION"
-          curl -sSf https://bootstrap.pypa.io/get-pip.py | "$PYTHON"
-
+          export PYTHON="/code/python/bin/python3"
           export PYTHONUNBUFFERED=1
           export LANG=C.UTF-8
           export PYTHONIOENCODING=utf8
