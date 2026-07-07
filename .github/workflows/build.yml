@@ -64,6 +64,12 @@ jobs:
           # Use the Python binary from actions/setup-python mounted from the host
           export PYTHON="${{ env.pythonLocation }}/bin/python3"
 
+          # Create global symlinks inside the container so other test scripts/executors
+          # can find python, python3, and python3.X seamlessly under any invocation name.
+          ln -sf "$PYTHON" /usr/local/bin/python
+          ln -sf "$PYTHON" /usr/local/bin/python3
+          ln -sf "$PYTHON" "/usr/local/bin/python$PYTHON_VERSION"
+
           "$PYTHON" -m pip install --upgrade pip wheel
           "$PYTHON" -m pip install cython coverage
           "$PYTHON" -m pip install -e .[test]
@@ -129,6 +135,13 @@ jobs:
 
           # Use the Python binary from actions/setup-python mounted from the host
           export PYTHON="${{ env.pythonLocation }}/bin/python3"
+
+          # Create global symlinks inside the container so other test scripts/executors
+          # can find python, python3, and python3.X seamlessly under any invocation name.
+          ln -sf "$PYTHON" /usr/local/bin/python
+          ln -sf "$PYTHON" /usr/local/bin/python3
+          ln -sf "$PYTHON" "/usr/local/bin/python$PYTHON_VERSION"
+
           export PYTHONUNBUFFERED=1
           export LANG=C.UTF-8
           export PYTHONIOENCODING=utf8
