@@ -42,39 +42,16 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        # python-build-standalone ships pre-built CPython for any Linux distro.
-        # No PPA, no apt, no DMOJ dependency required.
+        # Test on 4 active python versions (3.10 to 3.13)
         python-version: [ '3.10', '3.11', '3.12', '3.13' ]
     steps:
       - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
       - name: Download docker image
         run: docker pull dmoj/runtimes-tier3
-      - name: Download python-build-standalone
-        run: |
-          # Query the latest release from astral-sh/python-build-standalone.
-          # We pick the "install_only" x86_64 GNU/Linux build – a self-contained
-          # CPython that works on any Linux distro without extra apt packages.
-          ASSET_URL=$(curl -sSf "https://api.github.com/repos/astral-sh/python-build-standalone/releases/latest" \
-            | python3 -c "
-          import sys, json, re
-          data = json.load(sys.stdin)
-          ver = '${{ matrix.python-version }}'
-          # Match e.g. cpython-3.11.*-x86_64-unknown-linux-gnu-install_only.tar.gz
-          pattern = re.compile(
-              r'^cpython-' + re.escape(ver) + r'\.\d+\+\d+-x86_64-unknown-linux-gnu-install_only\.tar\.gz$'
-          )
-          for a in data.get('assets', []):
-              if pattern.match(a['name']):
-                  print(a['browser_download_url'])
-                  break
-          else:
-              raise SystemExit(f'No install_only asset found for Python {ver} (x86_64)')
-          ")
-          echo "Downloading: $ASSET_URL"
-          curl -sSfL "$ASSET_URL" | tar -xz
-          # The tarball extracts to a directory like python/
-          # Expose a predictable path for the docker scripts below.
-          echo "PYTHON_DIR=$(pwd)/python" >> "$GITHUB_ENV"
       - name: Create docker scripts
         run: |
           cat > run <<'EOF'
@@ -84,8 +61,8 @@ jobs:
           export PYTHONIOENCODING=utf8
           cd /code
 
-          # Use the pre-built Python mounted from the host runner.
-          export PYTHON="/code/python/bin/python3"
+          # Use the Python binary from actions/setup-python mounted from the host
+          export PYTHON="${{ env.pythonLocation }}/bin/python3"
 
           "$PYTHON" -m pip install --upgrade pip wheel
           "$PYTHON" -m pip install cython coverage
@@ -121,6 +98,7 @@ jobs:
             -e PYTHON_VERSION="${{ matrix.python-version }}" \
             -v "$(pwd):/code" \
             -v "$HOME/docker-cache:/root/.cache" \
+            -v "${{ env.pythonLocation }}:${{ env.pythonLocation }}" \
             --cap-add=SYS_PTRACE \
             dmoj/runtimes-tier3 \
             /code/run || true
@@ -136,6 +114,10 @@ jobs:
         python-version: [ '3.11' ]
     steps:
       - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
       - name: Download docker image
         run: docker pull dmoj/runtimes-tier3
       - name: Create docker scripts
@@ -145,25 +127,8 @@ jobs:
           cp -r /source /code
           cd /code
 
-          # Query latest python-build-standalone aarch64 build.
-          ASSET_URL=$(curl -sSf "https://api.github.com/repos/astral-sh/python-build-standalone/releases/latest" \
-            | python3 -c "
-          import sys, json, re
-          data = json.load(sys.stdin)
-          ver = '${{ matrix.python-version }}'
-          pattern = re.compile(
-              r'^cpython-' + re.escape(ver) + r'\.\d+\+\d+-aarch64-unknown-linux-gnu-install_only\.tar\.gz$'
-          )
-          for a in data.get('assets', []):
-              if pattern.match(a['name']):
-                  print(a['browser_download_url'])
-                  break
-          else:
-              raise SystemExit(f'No install_only asset found for Python {ver} (aarch64)')
-          ")
-          curl -sSfL "$ASSET_URL" | tar -xz
-
-          export PYTHON="/code/python/bin/python3"
+          # Use the Python binary from actions/setup-python mounted from the host
+          export PYTHON="${{ env.pythonLocation }}/bin/python3"
           export PYTHONUNBUFFERED=1
           export LANG=C.UTF-8
           export PYTHONIOENCODING=utf8
@@ -196,6 +161,7 @@ jobs:
             -e PYTHON_VERSION="${{ matrix.python-version }}" \
             -v "$(pwd):/source" \
             -v "$HOME/docker-cache:/root/.cache" \
+            -v "${{ env.pythonLocation }}:${{ env.pythonLocation }}" \
             --entrypoint=/usr/bin/tini \
             --cap-add=SYS_PTRACE \
             dmoj/runtimes-tier3 /source/run || true
