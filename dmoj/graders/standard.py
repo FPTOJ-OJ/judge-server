@@ -232,32 +232,25 @@ def _create_case_symlinks(path: str) -> None:
     dir_name = os.path.dirname(path) or '.'
     base_name = os.path.basename(path)
 
-    # Separate basename into stem and extension.
-    dot = base_name.rfind('.')
-    if dot != -1:
-        stem = base_name[:dot]
-        ext = base_name[dot:]
-    else:
-        stem = base_name
-        ext = ''
-
-    # Collect positions of alphabetic characters in the stem.
-    alpha_pos = [(i, ch) for i, ch in enumerate(stem) if ch.isalpha()]
+    # Collect positions of alphabetic characters in the full basename
+    # (including extension), so case variants are generated for both
+    # the stem and the extension.
+    alpha_pos = [(i, ch) for i, ch in enumerate(base_name) if ch.isalpha()]
 
     # If the filename has too many letters the combinatorial explosion
     # isn't worth it – fall back to the three most common patterns.
     MAX_COMBINATIONS = 256  # 2^8
     if len(alpha_pos) > 8:
-        _try_symlink(dir_name, base_name, stem.lower() + ext)
-        _try_symlink(dir_name, base_name, stem.upper() + ext)
-        _try_symlink(dir_name, base_name, stem.capitalize() + ext)
+        _try_symlink(dir_name, base_name, base_name.lower())
+        _try_symlink(dir_name, base_name, base_name.upper())
+        _try_symlink(dir_name, base_name, base_name.capitalize())
         return
 
     for bits in itertools.product((0, 1), repeat=len(alpha_pos)):
-        chars = list(stem)
+        chars = list(base_name)
         for (idx, _), bit in zip(alpha_pos, bits):
             chars[idx] = chars[idx].upper() if bit else chars[idx].lower()
-        variant = ''.join(chars) + ext
+        variant = ''.join(chars)
         if variant != base_name:
             _try_symlink(dir_name, base_name, variant)
 
