@@ -22,10 +22,10 @@ The judge implements secure grading on Linux and FreeBSD machines.
 
 |     | Linux | FreeBSD |
 | --: | :---: | :-----: |
-| x64 | [✔](https://github.com/FPTOJ-OJ/judge-server/actions/workflows/build.yml) | [❌](https://ci.dmoj.ca/job/dmoj-judge-freebsd/) |
+| x64 | [✔](https://github.com/FPTOJ-OJ/judge-server/actions/workflows/build.yml) | [❌] |
 | x86 | ✔ | ¯\\\_(ツ)\_/¯ |
 | x32 | ✔ | &mdash; |
-| ARM | [✔](https://github.com/FPTOJ-OJ/judge-server/actions/workflows/build.yml) | ❌ |
+| ARM | ❌ | ❌ |
 
 with pure ptrace without seccomp, which is useful on Linux kernel versions before 4.8.
 
@@ -87,7 +87,7 @@ Installing the FPTOJ judge creates two executables in your Python's script direc
 `dmoj` is used to connect a judge to a FPTOJ site instance, while `dmoj-cli` provides a command-line interface to a
 local judge, useful for testing problems.
 
-For more detailed steps, read the [installation instructions](https://docs.dmoj.ca/#/judge/setting_up_a_judge).
+For more detailed steps, read the [installation instructions](https://docs.fptoj.com/judge/setting_up_a_judge/).
 
 Note that **the only Linux distribution with first-class support is the latest Debian**, with the default `apt` versions of all runtimes. This is [what we run on fptoj.com](https://fptoj.com/runtimes/matrix/), and it should "just work". While the judge will likely still work with other distributions and runtime versions, some runtimes might fail to initialize. In these cases, please [file an issue](https://github.com/FPTOJ-OJ/judge-server/issues).
 
@@ -211,4 +211,4 @@ optional arguments:
 
 ## Documentation
 
-For info on the problem file format and more, [read the documentation](https://docs.dmoj.ca).
+For info on the problem file format and more, [read the documentation](https://docs.fptoj.com).
